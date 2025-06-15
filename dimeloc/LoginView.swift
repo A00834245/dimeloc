@@ -5,14 +5,12 @@ struct LoginView: View {
 
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var errorMessage: String? = nil
 
     var body: some View {
         VStack(alignment: .center, spacing: 60) {
             Text("Login")
-                .font(
-                    Font.custom("Rethink Sans", size: 40)
-                        .weight(.bold)
-                )
+                .font(.system(size: 40, weight: .bold))
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(red: 0.1, green: 0.08, blue: 0.14))
                 .frame(maxWidth: .infinity, alignment: .top)
@@ -20,17 +18,23 @@ struct LoginView: View {
             VStack(alignment: .center, spacing: 30) {
                 VStack(alignment: .trailing, spacing: 12) {
                     inputField(title: "Correo", text: $email, placeholder: "Ingresa tu correo", isSecure: false)
+                    inputField(title: "Contraseña", text: $password, placeholder: "Ingresa tu contraseña", isSecure: true)
 
-                    inputField(title: "Contrase\u00f1a", text: $password, placeholder: "Ingresa tu contrase\u00f1a", isSecure: true)
+                    if let error = errorMessage {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading)
+                    }
                 }
                 .padding(.horizontal, 16)
-                .padding(.vertical, 0)
                 .frame(maxWidth: .infinity, alignment: .topTrailing)
 
-                Button(action: onLogin) {
+                Button(action: handleLogin) {
                     HStack(alignment: .center, spacing: 8) {
-                        Text("Inicia sesi\u00f3n")
-                            .font(Font.custom("Rethink Sans", size: 14).weight(.bold))
+                        Text("Inicia sesión")
+                            .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
@@ -41,11 +45,28 @@ struct LoginView: View {
                     .cornerRadius(Constants.RadiusFull)
                 }
             }
-            .padding(0)
             .frame(maxWidth: .infinity, alignment: .top)
         }
-        .padding(0)
-        .frame(width: 390, alignment: .top)
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .top)
+    }
+
+    private func handleLogin() {
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmedEmail.isEmpty && trimmedPassword.isEmpty {
+            errorMessage = "Necesitas ingresar tus datos."
+        } else if trimmedEmail.isEmpty {
+            errorMessage = "Falta el correo electrónico."
+        } else if trimmedPassword.isEmpty {
+            errorMessage = "Falta la contraseña."
+        } else if trimmedEmail.lowercased() == "maruca@arca.mx" && trimmedPassword == "Temporal123!" {
+            errorMessage = nil
+            onLogin()
+        } else {
+            errorMessage = "Correo o contraseña incorrectos."
+        }
     }
 
     @ViewBuilder
@@ -53,35 +74,29 @@ struct LoginView: View {
         VStack(alignment: .trailing, spacing: 6) {
             HStack(alignment: .center, spacing: 6) {
                 Text(title)
-                    .font(
-                        Font.custom("Rethink Sans", size: 14)
-                            .weight(.bold)
-                    )
+                    .font(.system(size: 14, weight: .bold))
                     .kerning(0.14)
                     .foregroundColor(Color(red: 0.1, green: 0.08, blue: 0.14))
                 Spacer()
             }
-            .padding(0)
             .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(alignment: .center, spacing: 8) {
                 if isSecure {
                     SecureField("", text: text, prompt: Text(placeholder)
-                        .font(Font.custom("Rethink Sans", size: 14))
+                        .font(.system(size: 14))
                         .kerning(0.14)
-                        .foregroundColor(Constants.NeutralN400)
-                        .frame(maxWidth: .infinity, alignment: .topLeading))
+                        .foregroundColor(Constants.NeutralN400))
                 } else {
                     TextField("", text: text, prompt: Text(placeholder)
-                        .font(Font.custom("Rethink Sans", size: 14))
+                        .font(.system(size: 14))
                         .kerning(0.14)
-                        .foregroundColor(Constants.NeutralN400)
-                        .frame(maxWidth: .infinity, alignment: .topLeading))
+                        .foregroundColor(Constants.NeutralN400))
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity)
             .background(Constants.ShadeWhite)
             .cornerRadius(8)
             .overlay(
@@ -90,8 +105,6 @@ struct LoginView: View {
                     .stroke(Constants.NeutralN200, lineWidth: 1.5)
             )
         }
-        .padding(0)
-        .frame(maxWidth: .infinity, alignment: .topTrailing)
     }
 }
 

@@ -5,16 +5,18 @@ struct ContentView: View {
     @State private var loggedIn = false
 
     var body: some View {
-        Group {
-            if showSplash {
-                SplashView()
-                    .transition(.opacity)
-            } else if !loggedIn {
-                LoginView(onLogin: { loggedIn = true })
-                    .transition(.opacity)
-            } else {
-                MainView()
-                    .transition(.opacity)
+        VStack { // Wrapper for padding
+            Group {
+                if showSplash {
+                    SplashView()
+                        .transition(.opacity)
+                } else if !loggedIn {
+                    LoginView(onLogin: { loggedIn = true })
+                        .transition(.opacity)
+                } else {
+                    MainView()
+                        .transition(.opacity)
+                }
             }
         }
         .onAppear {
